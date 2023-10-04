@@ -1,7 +1,7 @@
-import { list } from "postcss";
 import { useEffect, useState } from "react"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useParams } from "react-router-dom";
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -16,6 +16,7 @@ function shuffleArray(array) {
 
 
 export default function Trivia() {
+    const { id } = useParams();
     const [question, setQuestion] = useState("Loading Question...")
     const [incorrectAnswers, setIncorrectAnswers] = useState(["Loading Answer...", "Loading Answer...", "Loading Answer..."])
     const [answer, setAnswer] = useState("Loading Answer...")
@@ -28,13 +29,13 @@ export default function Trivia() {
         if (score >= 20) difficulty = "hard"
         else if (score >= 10) difficulty = "medium";
         const listOfAnswers = document.getElementById("answers")
-        listOfAnswers.childNodes.forEach(child => {
-            child.className = 'text-lg px-10 mx-auto button'
-        })
-
-        fetch(`https://opentdb.com/api.php?amount=1&difficulty=${difficulty}&category=18`)
+        fetch(`https://opentdb.com/api.php?amount=1&difficulty=${difficulty}&category=${id}`)
             .then(res => res.json())
             .then((data) => {
+                listOfAnswers.childNodes.forEach(child => {
+                    child.className = 'text-lg px-10 mx-auto button'
+                })
+
                 setQuestion(data.results[0].question);
                 setIncorrectAnswers(data.results[0].incorrect_answers)
                 setAnswer(data.results[0].correct_answer)
@@ -56,7 +57,7 @@ export default function Trivia() {
             setScore(score + 1);
 
             toast('You Are Right! 🎊 Good Job, Next Question!', {
-                position: "top-right",
+                position: "top-left",
                 autoClose: 2000,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -64,12 +65,17 @@ export default function Trivia() {
             });
         } else if (event.target.id !== answer && !event.target.className.includes("used")) {
             toast.error('Wrong Answer! Try Harder 😭', {
-                position: "top-right",
+                position: "top-left",
                 autoClose: 2000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 theme: "colored",
             });
+        }
+
+        if (!event.target.className.includes("used")) {
+            console.log("hello")
+            setTimeout(getCodingQuestion, 2 * 1000)
         }
 
         listOfAnswers.childNodes.forEach(child => {
@@ -83,13 +89,13 @@ export default function Trivia() {
             }
         })
 
-        setTimeout(getCodingQuestion, 2 * 1000)
+
     }
 
     function skipQuestion() {
         if (score > 0) {
             toast.error('1 point has been removed from your score.', {
-                position: "top-right",
+                position: "top-left",
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,

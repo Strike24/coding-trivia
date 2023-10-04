@@ -17,7 +17,7 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: "/trivia",
+    path: "/trivia/:id",
     element: <Trivia />
   }
 ]);
